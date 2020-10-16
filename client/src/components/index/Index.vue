@@ -1,10 +1,10 @@
 <template>
   <div>
     <div class="tab">
-      <InputTab/>
+      <InputTab @onUpdate="update" />
     </div>
     <div class="tab">
-      <SearchTab/>
+      <SearchTab @onUpdate="update" :books="loadedBooks"/>
     </div>
   </div>
 </template>
@@ -12,12 +12,36 @@
 <script>
 import SearchTab from './components/SearchTab.vue';
 import InputTab from './components/InputTab.vue';
+import axios from "axios";
 
 export default {
   name: 'Index',
   components: {
     SearchTab,
     InputTab
+  },
+  data(){
+    return {
+      loadedBooks: []
+    }
+  },
+  mounted: function(){
+    axios.get('http://localhost:3000/books')
+    .then((books) => {
+      this.loadedBooks = books.data})
+  },
+  methods: {
+    async update(querry){
+      if(querry) {
+        await axios.post('http://localhost:3000/books/multiple', querry)
+          .then((books) => {
+            this.loadedBooks = books.data})
+      } else {
+        await axios.get('http://localhost:3000/books')
+          .then((books) => {
+            this.loadedBooks = books.data})
+        }
+    }
   }
 }
 </script>
